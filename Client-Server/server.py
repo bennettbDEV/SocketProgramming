@@ -11,7 +11,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM ) as s:
         print(f"Connected by {addr}")
         while True:
             data = conn.recv(1024)
-            if not data: break
+            if not data: 
+                break
             print("Client msg: " + (str(data)[1:]))
             conn.sendall(data)
         s.close()
