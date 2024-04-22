@@ -4,7 +4,7 @@ def recieveMsg(connection):
     '''
     Takes in connection socket and recieves message from client
     Returns the text recieved as a string
-    if recieving data fails, returns "Invalid input"
+    if recieving data fails, returns "Invalid input".
     
     '''
     data = connection.recv(1024)
@@ -14,6 +14,7 @@ def recieveMsg(connection):
 def sendMsg(connection, message):
     '''
     Takes in connection socket and the message to be sent
+    then encodes the message and sends it.
     '''
     connection.sendall((message).encode('UTF-8'))
     
@@ -48,7 +49,8 @@ def game_turn(hand1,hand2):
             return "Tie"
         else:
             return "Player2 wins"
-def play_game(connection):
+def play_game(conn):
+
     sendMsg(conn,"Play rock paper scissors? Answer Y/N")
     firstmessage = recieveMsg(conn)
     print("Client msg: " + firstmessage)
@@ -79,21 +81,26 @@ def play_game(connection):
 HOST = socket.gethostname()  # The server's hostname or IP address
 PORT = 8888  # The port used by the server
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM ) as s:
-    
-    s.bind((HOST,PORT))
-    s.listen()
-    (conn, addr) = s.accept()
-    with conn:
-        print(f"{addr} connected")
-        sendMsg(conn, "Send 'game' at anytime to initite the game")
-        while True:
-            recieved_message = recieveMsg(conn)
-            if recieved_message == "game":
-                play_game(conn)
-            print("Client: " + recieved_message)
-            message = input()
-            sendMsg(conn,message)
-                                
-        s.close()
+def main():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM ) as s:
         
+        s.bind((HOST,PORT))
+        s.listen()
+        (conn, addr) = s.accept()
+        with conn:
+            print(f"{addr} connected")
+            sendMsg(conn, "Send 'game' at anytime to initite the game")
+            while True:
+                recieved_message = recieveMsg(conn)
+                if recieved_message == "game":
+                    play_game(conn)
+                elif recieved_message == "end":
+                    print("Connection closed by client")
+                    s.close()
+                print("Client: " + recieved_message)
+                message = input()
+                sendMsg(conn,message)
+                                    
+            s.close()
+
+main()
