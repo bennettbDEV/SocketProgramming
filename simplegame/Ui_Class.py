@@ -18,7 +18,8 @@ class Game_Ui(customtkinter.CTk):
         self.grid_rowconfigure(0, weight=1)
 
         # widgets
-        #self.popup = Popup(self)
+        self.start_dialog()
+
         self.side_bar = Sidebar(self)
         self.main = Main(self)
 
@@ -29,36 +30,32 @@ class Game_Ui(customtkinter.CTk):
         Will create a popup object, which asks the user for their name
         and will return the String result.
         '''
-        pass 
+        # Eventually, override the _cancel_event, and _on_closing functions to terminate the entire program
+        dialog = customtkinter.CTkInputDialog(text="Enter your name:", title="StartDialog")
+        username = dialog.get_input()
+        print("Username:", username)
+        self.quit()  
+        return username
+    
     def start_rps(self):
         '''
         Will create a Rockpaperscissors object, which has an additional window for the game
         '''
+
         pass 
     def receive_msg(self):
         '''
         Takes in a string message and adds a chat message to the main text box
         '''
+
         pass
     def send_msg(self):
         '''
         Takes in a string to send to other users
         '''
-        pass
 
+        pass
     
-class Popup(customtkinter.CTkInputDialog):
-    '''
-    still needs funtionality
-    '''
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.open_input_dialog_event()
-        
-    def open_input_dialog_event(self):
-        dialog = customtkinter.CTkInputDialog(text="Enter your name:", title="CTkInputDialog")
-        print("Username:", dialog.get_input())
-        self.quit()      
 
 class Sidebar(customtkinter.CTkFrame):
 
