@@ -1,6 +1,6 @@
 import socket
 
-HOST = "<Insert IP here>"  # The server's hostname or IP address
+HOST = "10.135.13.123"  # The server's hostname or IP address
 PORT = 8888  # The port used by the server
 
 def main():

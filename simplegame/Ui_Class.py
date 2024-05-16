@@ -3,6 +3,7 @@ import tkinter.messagebox
 import customtkinter
 
 class Game_Ui(customtkinter.CTk):
+    
     def __init__(self, title, size):
 
         # main setup
@@ -16,9 +17,8 @@ class Game_Ui(customtkinter.CTk):
         self.grid_columnconfigure(1, weight=4)
 
         self.grid_rowconfigure(0, weight=1)
-
         # widgets
-        self.start_dialog()
+        self.username = self.start_dialog()
 
         self.side_bar = Sidebar(self)
         self.main = Main(self)
@@ -33,7 +33,6 @@ class Game_Ui(customtkinter.CTk):
         # Eventually, override the _cancel_event, and _on_closing functions to terminate the entire program
         dialog = customtkinter.CTkInputDialog(text="Enter your name:", title="StartDialog")
         username = dialog.get_input()
-        print("Username:", username)
         self.quit()  
         return username
     
@@ -116,7 +115,3 @@ class Main(customtkinter.CTkFrame):
         entry.grid(row=1, column=0, padx=(20, 0), pady=5, sticky = "we")
         main_button_1.grid(row=1, column=1, padx=(20, 20), pady=5)
         textbox.grid(row=0, column=0, columnspan=2, padx=10, pady=(10, 0), sticky="nsew")
-
-
-
-Game_Ui("Simple Game", (600,500))
