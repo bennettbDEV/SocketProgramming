@@ -1,24 +1,51 @@
 import socket
-import ui_class
+import threading
 
-def recieveMsg(connection):
+def acceptConnections():
     '''
-    Takes in connection socket and recieves message from client
-    Returns the text recieved as a string
-    if recieving data fails, returns "Invalid input".
-    
+    Accepts connections, requests the inputed name from the client.
+    Adds the connection and name to list of known clients.
+    Starts thread with connection to client to recieve messages from them.
     '''
-    data = connection.recv(1024)
-    if not data:
-        return "Invalid input"
-    return (str(data)[2:-1])
-def sendMsg(connection, message):
+    while True:
+        (conn, addr) = s.accept()
+        print(f"{addr} connected")
+
+        conn.send("Return_Name".encode('UTF-8'))
+        name = conn.recv(1024).decode('UTF-8')
+
+        names.append(name)
+        clients.append(conn)
+
+        conn.send("Connection to server successful\n".encode('UTF-8'))
+        sendMsg(f"{name} joined the chatroom\n")
+        
+        thread = threading.Thread(target=recieveMsg,args=(conn,))
+        thread.start()
+
+### Add encryption for both sending and recieving msgs
+def sendMsg(message):
     '''
-    Takes in connection socket and the message to be sent
-    then encodes the message and sends it.
+    Takes in message to be sent
+    then encodes the message and sends it to all clients.
     '''
-    connection.sendall((message).encode('UTF-8'))
-    
+    for client in clients:
+        client.send(message.encode('UTF-8'))
+def recieveMsg(client):
+    while True:
+        try:
+            msg = client.recv(1024).decode('UTF-8')
+            fmt_msg = f"{names[clients.index(client)]}: {msg}"
+            print(fmt_msg)
+            sendMsg(fmt_msg+"\n")
+        except:
+            index = clients.index(client)
+            clients.remove(client)
+            client.close()
+            name = names[index]
+            names.remove(name)
+            break
+
 def choose_hand(input):
     if input == "rock" or input == "r":
         return 0
@@ -79,33 +106,18 @@ def play_game(conn):
         sendMsg(conn, (hands + result + "-1"))
     return True
 
+
+
 HOST = socket.gethostname()  # The server's hostname or IP address
 PORT = 8888  # The port used by the server
 
-def main():
-
-    game = ui_class.Game_Ui("Simple Game", (600,500))
-    print(game.username)
-
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM ) as s:
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM )
         
-        s.bind((HOST,PORT))
-        s.listen()
-        (conn, addr) = s.accept()
-        with conn:
-            print(f"{addr} connected")
-            sendMsg(conn, "Send 'game' at anytime to initite the game")
-            while True:
-                recieved_message = recieveMsg(conn)
-                if recieved_message == "game":
-                    play_game(conn)
-                elif recieved_message == "end":
-                    print("Connection closed by client")
-                    s.close()
-                print("Client: " + recieved_message)
-                message = input()
-                sendMsg(conn,message)
-                                    
-            s.close()
+s.bind((HOST,PORT))
+s.listen()
 
-main()
+#Replace seperate lists for clients and names to a single dictionary/hashtable
+clients = []
+names = []
+
+acceptConnections()

@@ -1,11 +1,7 @@
-import tkinter as tk
-import tkinter.messagebox
 import customtkinter
 
-class Game_Ui(customtkinter.CTk):
-    
+class UIClass(customtkinter.CTk):
     def __init__(self, title, size):
-
         # main setup
         super().__init__()
         self.title(title)
@@ -22,19 +18,21 @@ class Game_Ui(customtkinter.CTk):
 
         self.side_bar = Sidebar(self)
         self.main = Main(self)
+        #self.destroy()
 
-        self.mainloop()
-    
     def start_dialog(self):
         '''
         Will create a popup object, which asks the user for their name
         and will return the String result.
         '''
         # Eventually, override the _cancel_event, and _on_closing functions to terminate the entire program
-        dialog = customtkinter.CTkInputDialog(text="Enter your name:", title="StartDialog")
+        dialog = customtkinter.CTkInputDialog(text="Enter your name:", title="Login")
         username = dialog.get_input()
         self.quit()  
         return username
+    
+    def start_chatBox(self):
+        self.mainloop()
     
     def start_rps(self):
         '''
@@ -42,20 +40,8 @@ class Game_Ui(customtkinter.CTk):
         '''
 
         pass 
-    def receive_msg(self):
-        '''
-        Takes in a string message and adds a chat message to the main text box
-        '''
 
-        pass
-    def send_msg(self):
-        '''
-        Takes in a string to send to other users
-        '''
-
-        pass
     
-
 class Sidebar(customtkinter.CTkFrame):
 
     def __init__(self, parent):
@@ -100,18 +86,37 @@ class Main(customtkinter.CTkFrame):
         main_frame.grid_rowconfigure(0, weight=6)
         main_frame.grid_rowconfigure(1, weight=1)
 
+        self.entry = customtkinter.CTkEntry(main_frame, placeholder_text="Type your message here...")
+        self.textbox = customtkinter.CTkTextbox(main_frame, width=250)
+
+        self.queued = False
+        self.entry_text = ""
+
         self.make_widgets(main_frame)
 
     def make_widgets(self, main_frame):
         
         # Creating widgets
-        entry = customtkinter.CTkEntry(main_frame, placeholder_text="Type your message here...")
-        main_button_1 = customtkinter.CTkButton(master=main_frame, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"))
+        main_button_1 = customtkinter.CTkButton(master=main_frame, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), command=self.send_entry)
         main_button_1.configure(text="Send")
-        textbox = customtkinter.CTkTextbox(main_frame, width=250)
-        textbox.insert("0.0", "Textbox")
+
+        #self.textbox.insert("0.0", "!")
+        self.textbox.configure(state="disabled")
 
         # Placing widgets
-        entry.grid(row=1, column=0, padx=(20, 0), pady=5, sticky = "we")
+        self.entry.grid(row=1, column=0, padx=(20, 0), pady=5, sticky = "we")
         main_button_1.grid(row=1, column=1, padx=(20, 20), pady=5)
-        textbox.grid(row=0, column=0, columnspan=2, padx=10, pady=(10, 0), sticky="nsew")
+        self.textbox.grid(row=0, column=0, columnspan=2, padx=10, pady=(10, 0), sticky="nsew")
+
+    def send_entry(self):
+        self.entry_text = self.entry.get()
+        self.queued = True
+        self.entry.delete(0, "end")
+
+    def write_msg(self, text):
+        self.textbox.configure(state="normal")
+        self.textbox.insert("end",text)
+        self.textbox.yview("end")
+        self.textbox.configure(state="disabled")
+
+        
