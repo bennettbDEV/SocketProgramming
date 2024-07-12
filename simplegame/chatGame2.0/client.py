@@ -4,7 +4,7 @@ import time
 import UIClass
 
 
-HOST = "###.###.###.###"  # The server's hostname or IP address
+HOST = "####.####.####.####"  # The server's hostname or IP address
 PORT = 8888  # The port used by the server
 
 class Client:
@@ -15,6 +15,7 @@ class Client:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM )
         self.s.connect((host,port))
         self.running = True
+        self.rps_running = False
 
         self.ui.protocol("WM_DELETE_WINDOW", self.stop)
 
@@ -35,6 +36,9 @@ class Client:
                 # Replace the "return name" to get clients name with RPyC 
                 if msg == "Return_Name":
                     self.s.send(self.name.encode('UTF-8'))
+                elif msg == "OPEN_RPS#":
+                    self.rps_running = True
+                    self.ui.start_rps()
                 else:
                     self.ui.main.write_msg(msg)
             except ConnectionAbortedError:
@@ -50,6 +54,15 @@ class Client:
                 msg = self.ui.main.entry_text
                 self.s.send(msg.encode('UTF-8'))
                 self.ui.main.queued = False
+            elif(self.ui.side_bar.queued):
+                msg = self.ui.side_bar.game_choice
+                self.s.send(msg.encode('UTF-8'))
+                self.ui.side_bar.queued = False
+            elif(self.rps_running and self.ui.rps.queued):
+                msg = self.ui.rps.hand
+                self.s.send(msg.encode('UTF-8'))
+                self.ui.rps.queued = False
+
 
     def stop(self):
         self.running = False

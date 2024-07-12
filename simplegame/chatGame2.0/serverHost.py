@@ -1,5 +1,6 @@
 import socket
 import threading
+from datetime import datetime
 
 def acceptConnections():
     '''
@@ -35,9 +36,19 @@ def recieveMsg(client):
     while True:
         try:
             msg = client.recv(1024).decode('UTF-8')
-            fmt_msg = f"{names[clients.index(client)]}: {msg}"
-            print(fmt_msg)
-            sendMsg(fmt_msg+"\n")
+            if msg == "INITIATE_RPS#":
+                fmt_msg = f"{names[clients.index(client)]}: wants to play rock paper scissors. Type 'PLAY {names[clients.index(client)]}'"
+                client.send("OPEN_RPS#".encode('UTF-8'))
+                initiate_rps = f"PLAY {names[clients.index(client)]}"
+                print(fmt_msg)
+                sendMsg(fmt_msg+"\n")
+            elif game_queued and msg == initiate_rps:
+                pass
+            else:
+                cur_time = "[" + (datetime.now().strftime("%H:%M:%S")) + "]"
+                fmt_msg = f"{cur_time} {names[clients.index(client)]}: {msg}"
+                print(fmt_msg)
+                sendMsg(fmt_msg+"\n")
         except:
             index = clients.index(client)
             clients.remove(client)
@@ -119,5 +130,9 @@ s.listen()
 #Replace seperate lists for clients and names to a single dictionary/hashtable
 clients = []
 names = []
+
+game_queued = False
+initiate_rps = ""
+
 
 acceptConnections()
