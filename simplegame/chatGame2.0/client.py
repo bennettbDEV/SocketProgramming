@@ -9,7 +9,7 @@ PORT = 8888  # The port used by the server
 
 class Client:
     def __init__(self, host, port):
-        self.ui = UIClass.UIClass("chat",(500,400))
+        self.ui = UIClass.UIClass("Chat",(500,400))
         self.name = self.ui.username
 
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM )
@@ -39,6 +39,9 @@ class Client:
                 elif msg == "OPEN_RPS#":
                     self.rps_running = True
                     self.ui.start_rps()
+                elif msg == "CLOSE_RPS#":
+                    self.rps_running = False
+                    self.ui.stop_rps()
                 else:
                     self.ui.main.write_msg(msg)
             except ConnectionAbortedError:

@@ -5,7 +5,6 @@ class UIClass(customtkinter.CTk):
     def __init__(self, title, size):
         # main setup
         super().__init__()
-        self.title(title)
         self.geometry(f"{size[0]}x{size[1]}")
         self.minsize(size[0],size[1])
 
@@ -16,6 +15,7 @@ class UIClass(customtkinter.CTk):
         self.grid_rowconfigure(0, weight=1)
         # widgets
         self.username = self.start_dialog()
+        self.title(f"{title} - {self.username}")
         
         self.side_bar = Sidebar(self)
         self.main = Main(self)
@@ -47,6 +47,11 @@ class UIClass(customtkinter.CTk):
             self.rps = RockPaperScissors()  # create window if its None or destroyed
         else:
             self.rps.focus()  # if window exists focus it
+    def stop_rps(self):
+        self.main.entry.configure(state="normal")
+        self.side_bar.rps_button.configure(state="normal")
+        if not(self.rps is None or not self.rps.winfo_exists()):
+            self.rps.destroy()
 
     
 class Sidebar(customtkinter.CTkFrame):
